@@ -23,8 +23,8 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences defPreference = PreferenceManager.getDefaultSharedPreferences(this);
         myCheck = new ConnectivityCheck(this);
-        myCheck.isNetworkReachable();
-        myCheck.isWifiReachable();
+        doNetworkCheck(findViewById(android.R.id.content).getRootView());
+        doWirelessCheck(findViewById(android.R.id.content).getRootView());
 
     }
 
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -47,12 +47,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void doNetworkCheck(View view) {
-        String res =myCheck.isNetworkReachable()?"Network Reachable":"No Network";
-        Toast.makeText(this, res,Toast.LENGTH_SHORT).show();
+        String res = myCheck.isNetworkReachable() ? "Network Reachable" : "No Network";
+        Toast t = Toast.makeText(this, res, Toast.LENGTH_SHORT);
+        t.show();
     }
 
     public void doWirelessCheck(View view) {
-        String res =myCheck.isWifiReachable()?"WiFi Reachable":"No WiFi";
-        Toast.makeText(this, res,Toast.LENGTH_SHORT).show();
+        String res = myCheck.isWifiReachable() ? "WiFi Reachable" : "No WiFi";
+        Toast.makeText(this, res, Toast.LENGTH_SHORT).show();
     }
 }
