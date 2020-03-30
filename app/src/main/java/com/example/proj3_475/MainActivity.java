@@ -1,19 +1,31 @@
 package com.example.proj3_475;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 public class MainActivity extends AppCompatActivity {
+
+    ConnectivityCheck myCheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        SharedPreferences defPreference = PreferenceManager.getDefaultSharedPreferences(this);
+        myCheck = new ConnectivityCheck(this);
+        myCheck.isNetworkReachable();
+        myCheck.isWifiReachable();
+
     }
 
     @Override
@@ -22,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-
+    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -32,5 +44,15 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    public void doNetworkCheck(View view) {
+        String res =myCheck.isNetworkReachable()?"Network Reachable":"No Network";
+        Toast.makeText(this, res,Toast.LENGTH_SHORT).show();
+    }
+
+    public void doWirelessCheck(View view) {
+        String res =myCheck.isWifiReachable()?"WiFi Reachable":"No WiFi";
+        Toast.makeText(this, res,Toast.LENGTH_SHORT).show();
     }
 }
