@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import androidx.preference.PreferenceManager;
 public class MainActivity extends AppCompatActivity {
 
     ConnectivityCheck myCheck;
+    ImageView img =(ImageView)findViewById(R.id.imgView);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void doNetworkCheck(View view) {
+        img.setImageResource(R.drawable.);
         String res = myCheck.isNetworkReachable() ? "Network Reachable" : "No Network";
         Toast t = Toast.makeText(this, res, Toast.LENGTH_SHORT);
         t.show();
