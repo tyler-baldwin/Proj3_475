@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="Preference category">
 
-    </PreferenceCategory>
     <ListPreference
         android:defaultValue="1"
         android:entries="@array/info_choice"
         android:entryValues="@array/info_choice"
-        android:key="list_preference_1"
-        android:title="List preference" />
+        android:key="website"
+        android:title="Info"
+        android:summary= "Select site to get JSON"/>
 </PreferenceScreen>
