@@ -4,4 +4,8 @@
         <item>CNU - Defender</item>
         <item> Pair - Teton Software - Pets</item>
     </string-array>
+    <string-array name="URL">
+        <item>https://www.pcs.cnu.edu/~kperkins/pets/</item>
+        <item>https://tetonsoftware.com/pets/</item>
+    </string-array>
 </resources>
