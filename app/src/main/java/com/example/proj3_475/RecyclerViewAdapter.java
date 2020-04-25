@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class RecyclerViewAdapter extends RecyclerView.Adapter {
     private Context ctx;
     private LayoutInflater layoutInflater;
-    ArrayList<pet> pets = new ArrayList<pet>(0);
+    ArrayList<pet> pets ;
     private JSONArray jsonArray;
 
     String info_choice = "CNU - Defender";
@@ -161,7 +161,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
 //        DownloadJSON task1 = new DownloadJSON(URL);
 //        task1.execute();
         runDownloadJSON();
-        if (pets.size() != 0) {
+        if (pets!= null) {
             runDownloadImage((RViewHolder) holder, pets.get(position).file);
         } else {
             Toast.makeText(ctx.getApplicationContext(), "fuck a duck", android.widget.Toast.LENGTH_SHORT).show();
@@ -262,7 +262,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
 
     public void processJSON(String string) {
         try {
-            Toast.makeText(ctx.getApplicationContext(), "procssing json", android.widget.Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx.getApplicationContext(), "process" + string, android.widget.Toast.LENGTH_SHORT).show();
 
             pets.clear();
             JSONObject jsonObject = new JSONObject(string);
