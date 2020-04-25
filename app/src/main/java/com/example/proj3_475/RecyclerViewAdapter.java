@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 public class RecyclerViewAdapter extends RecyclerView.Adapter {
     private Context ctx;
     private LayoutInflater layoutInflater;
-    ArrayList<pet> pets ;
+    ArrayList<pet> pets = new ArrayList<>(0);
     private JSONArray jsonArray;
 
     String info_choice = "CNU - Defender";
@@ -47,6 +46,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
             super(itemView);
             iv = (ImageView) itemView.findViewById(R.id.imgView);
             tv = (TextView) itemView.findViewById(R.id.errorText);
+
         }
     }
 
@@ -74,9 +74,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
 
         @Override
         protected Bitmap doInBackground(String... param) {
-            //TODO should this really be img
-//            Toast.makeText(ctx.getApplicationContext(), img[0], android.widget.Toast.LENGTH_SHORT).show();
-
             Log.w(TAG, param[0]);
             return downloadBitmap(param[0]);
         }
@@ -139,6 +136,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //call this when we need to create a brand new PagerViewHolder
         View view = layoutInflater.inflate(R.layout.swipelayout, parent, false);
+        runDownloadJSON();
         return new RViewHolder(view);   //the new one
     }
 
@@ -147,34 +145,28 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         //passing in an existing instance, reuse the internal resources
         //pass our data to our ViewHolder.
         RViewHolder viewHolder = (RViewHolder) holder;
+        ConnectivityCheck myCheck;
 
         //set to some default image
         viewHolder.iv.setImageResource(R.drawable.error404);
-        viewHolder.tv.setText("Image : " + position);
+        viewHolder.tv.setText("ERROR SERVER UNREACHABLE");
         viewHolder.position = position;       //remember which image this view is bound to
 
-        //launch a thread to 'retreive' the image
 
-//        if (pets.size() != 0) {
-//            runDownloadImage(viewHolder, pets.get(position).file);
-//        }
-//        DownloadJSON task1 = new DownloadJSON(URL);
-//        task1.execute();
+        //launch a thread to 'retreive' the image
         runDownloadJSON();
-        if (pets!= null) {
+        if (pets.size() != 0) {
             runDownloadImage((RViewHolder) holder, pets.get(position).file);
+            viewHolder.tv.setText(pets.get(position).name + position);
         } else {
-            Toast.makeText(ctx.getApplicationContext(), "fuck a duck", android.widget.Toast.LENGTH_SHORT).show();
+            return;
         }
-//        DownloadIMG myTask = new DownloadIMG(new String[]{"p0.png"},viewHolder);
-//        myTask.execute(new String[]{URL});
     }
 
     public void runDownloadImage(@NonNull RViewHolder holder, String imageFile) {
         String fullImageURL = URL + imageFile;
         new DownloadIMG(holder).execute(new String[]{fullImageURL});
     }
-
 
 
     @Override
@@ -184,16 +176,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
 
     public void runDownloadJSON() {
         String fullJSONURL = URL + "pets.json";
-        Toast.makeText(ctx.getApplicationContext(), fullJSONURL, android.widget.Toast.LENGTH_LONG).show();
         new DownloadJSON().execute(fullJSONURL);
     }
 
     private class DownloadJSON extends AsyncTask<String, Void, String> {
 
         private String myURL;
-        private int statusCode = 0;
         private String myQuery = "";
         private String TAG = "DownloadJSON";
+        protected int statusCode = 0;
 
         @Override
         protected String doInBackground(String... strings) {
@@ -209,15 +200,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
                 try {
                     // this opens a connection, then sends GET & headers
                     connection.connect();
+
                     // lets see what we got make sure its one of
                     // the 200 codes (there can be 100 of them
                     // http_status / 100 != 2 does integer div any 200 code will = 2
                     statusCode = connection.getResponseCode();
-                    if (statusCode / 100 != 2) {
+                    if (statusCode != 200) {
                         Log.e(TAG, "Error-connection.getResponseCode returned "
                                 + Integer.toString(statusCode));
                         return null;
                     }
+
 
                     in = new BufferedReader(new InputStreamReader(connection.getInputStream()), 8096);
 
@@ -233,10 +226,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
 
                 } finally {
                     // close resource no matter what exception occurs
-                    in.close();
+                    //in.close();
                     connection.disconnect();
                 }
             } catch (Exception exc) {
+                Log.e("DownloadJSON", "background error", exc);
+
                 return null;
             }
         }
@@ -248,7 +243,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
 
         @Override
         protected void onPostExecute(String jsonArray) {
-            Toast.makeText(ctx.getApplicationContext(), "post" + jsonArray, android.widget.Toast.LENGTH_SHORT).show();
             processJSON(jsonArray);
             super.onPostExecute(jsonArray);
         }
@@ -261,10 +255,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
 
 
     public void processJSON(String string) {
-        try {
-            Toast.makeText(ctx.getApplicationContext(), "process" + string, android.widget.Toast.LENGTH_SHORT).show();
 
-            pets.clear();
+        try {
+            if (pets.size() != 0) {
+                pets.clear();
+            }
             JSONObject jsonObject = new JSONObject(string);
             jsonArray = jsonObject.getJSONArray("pets");
 
@@ -276,7 +271,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
                 pets.add(new pet(name, file));
             }
         } catch (Exception e) {
-            Log.e("Error", "JSON error");
+            Log.e("Error", "JSON error", e);
+
             e.printStackTrace();
         }
     }
