@@ -3,37 +3,46 @@ package com.example.proj3_475;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
-
-import java.util.List;
+import androidx.viewpager2.widget.ViewPager2;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     ConnectivityCheck myCheck;
-    String info_choice;
-    List<pet> pets;
+    String info_choice = "CNU - Defender";
+    String URL = "https://www.pcs.cnu.edu/~kperkins/pets/";
+
+
+    ViewPager2 viewpager2;
+    RecyclerViewAdapter adapt;
+
+
+    private ImageView petImageview;
+    private TextView errorTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
-        setupSimpleSpinner();
+        viewpager2 = findViewById(R.id.vp2);
+        adapt = new RecyclerViewAdapter(this);
+        viewpager2.setAdapter(adapt);
 
+//        petImageview = findViewById(R.id.imgView);
+//        errorTextView = findViewById(R.id.errorText);
 
         SharedPreferences a = PreferenceManager.getDefaultSharedPreferences(this);
         a.registerOnSharedPreferenceChangeListener(this);
@@ -41,58 +50,56 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         myCheck = new ConnectivityCheck(this);
 
+
+//        runDownloadJSON();
+////        runDownloadImage("p0.png");
         doNetworkCheck(findViewById(android.R.id.content).getRootView());
-        doWirelessCheck(findViewById(android.R.id.content).getRootView());
-    }
-
-    Spinner spinner;
-
-    private void setupSimpleSpinner() {
-        //create a data adapter to fill above spinner with choices
-        //R.array.numbers is arraylist in strings.xml
-        //R.layout.spinner_item_simple is just a textview
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.info_choice, R.layout.spinner_item_simple);
-
-        //get a reference to the spinner
-        spinner = (Spinner) findViewById(R.id.spinner);
-
-        //bind the spinner to the datasource managed by adapter
-        if (spinner != null)
-            spinner.setAdapter(adapter);
-        //respond when spinner clicked
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public static final int SELECTED_ITEM = 0;
-
-            @Override
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int pos, long rowid) {
-                if (arg0.getChildAt(SELECTED_ITEM) != null) {
-                    ((TextView) arg0.getChildAt(SELECTED_ITEM)).setTextColor(Color.WHITE);
-                    Toast.makeText(MainActivity.this, (String) arg0.getItemAtPosition(pos), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-            }
-        });
+        //doWirelessCheck(findViewById(android.R.id.content).getRootView());
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         getPrefValues(PreferenceManager.getDefaultSharedPreferences((Context) this));
+        if (key.equals("website")) {
+            Toast.makeText(getApplicationContext(), "URL is " + info_choice, Toast.LENGTH_SHORT).show();
+            if (!myCheck.isNetworkReachable()) {
+                petImageview.setImageResource(R.drawable.error404);
+                errorTextView.setText("Network unreachable! Turn on network to see cuter pets!");
+                errorTextView.setVisibility(View.VISIBLE);
+            } else {
+                // spinner.setVisibility(View.VISIBLE);
+                Log.w("Preferences Changed", "trying to download JSON");
+                //runDownloadJSON();
+              //  runDownloadImage("p0.png");
+            }
+        }
     }
 
     private void getPrefValues(SharedPreferences settings) {
         this.info_choice = settings.getString("website", "CNU - Defender");
+        this.URL = settings.getString("website", "https://www.pcs.cnu.edu/~kperkins/pets/");
+        adapt.info_choice = this.info_choice;
+        adapt.URL = this.URL;
     }
 
+
+//    public void runDownloadImage(String imageFile) {
+//        String fullImageURL = URL + imageFile;
+//        new DownloadIMG().execute(new String[]{fullImageURL});
+//    }
+
+//    public void runDownloadJSON() {
+//        new DownloadJSON().execute(new String[]{getString(R.string.json)});
+//    }
+
+    //inflate settings menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
+    //settings selected
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -106,31 +113,28 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     protected void onResume() {
-        // TODO Auto-generated method stub
         super.onResume();
-        Toast.makeText(this, "onResume", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "onResume", Toast.LENGTH_LONG).show();
         SharedPreferences a = PreferenceManager.getDefaultSharedPreferences(this);
         info_choice = a.getString("website", "CNU - Defender");
-
+        URL = a.getString("website", "https://www.pcs.cnu.edu/~kperkins/pets/");
     }
 
     public void doNetworkCheck(View view) {
-        ImageView img = (ImageView) findViewById(R.id.imgView);
-        img.setImageResource(R.drawable.error404);
+//        ImageView img = (ImageView) findViewById(R.id.vp2);
+        //      img.setImageResource(R.drawable.error404);
         String res = myCheck.isNetworkReachable() ? "Network Reachable" : "No Network";
-        Toast t = Toast.makeText(this, res, Toast.LENGTH_SHORT);
-        t.show();
+       // Toast t = Toast.makeText(this, res, Toast.LENGTH_SHORT);
+      //  t.show();
     }
 
     public void doWirelessCheck(View view) {
         String res = myCheck.isWifiReachable() ? "WiFi Reachable" : "No WiFi";
-        Toast.makeText(this, res, Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, res, Toast.LENGTH_SHORT).show();
     }
 
 
 }
 
-class pet {
-    public String name;
-    public String url;
-}
+
+

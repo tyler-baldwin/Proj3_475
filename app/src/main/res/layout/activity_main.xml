@@ -18,15 +18,19 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/imgView"
+
+        </androidx.appcompat.widget.Toolbar>
+
+
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/vp2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            />
+        </FrameLayout>
 
-        </ImageView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </FrameLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>

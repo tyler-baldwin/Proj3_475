@@ -4,7 +4,7 @@
     <ListPreference
         android:defaultValue="1"
         android:entries="@array/info_choice"
-        android:entryValues="@array/info_choice"
+        android:entryValues="@array/URL"
         android:key="website"
         android:title="Info"
         android:summary= "Select site to get JSON"/>
